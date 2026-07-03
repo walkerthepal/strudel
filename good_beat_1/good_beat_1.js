@@ -7,16 +7,47 @@
 // ══════════════════════════════════════════════════════════════════════════════
 setcpm(84/4)
 
+// ══════════════════════════════════════════════════════════════════════════════
+// HORNS — a small brass section: SHARED melody on trumpet + French horn (bright
+// lead over a warm middle, panned apart), with fat trombone stabs on the offbeats.
+// Kept low & sparse so the guitar/bass theme stays out front. All lines are pure
+// chord tones — chill and diatonic.
+// ══════════════════════════════════════════════════════════════════════════════
+const horns = (mel, stab) => stack(
+  //note(mel).sound("gm_trumpet")                       // bright lead
+  // .gain(.15).lpf(2600).room(.4).vib(4).vibmod(.05).pan(.4),
+  note(mel).sound("gm_french_horn")                   // warm double — rounds the trumpet
+    .gain(.13).lpf(2200).room(.4).pan(.6),
+  note(stab).sound("gm_trombone")                     // fat low stabs (and-of-2, and-of-4)
+    .gain(.14).lpf(1800).room(.35).pan(.5)
+)
+
+// VERSE  : Bm7 – Em9 – Amaj7 – F#m7
+const verseMel  = "<[~ f#4 ~ a4 ~ ~ b4 ~] [~ b4 ~ a4 ~ g4 ~ f#4] [e4 ~ ~ g#4 a4 ~ ~ ~] [~ c#4 ~ d4 c#4 ~ ~ ~]>"
+const verseStab = "<[~ ~ ~ [f#4,a4] ~ ~ ~ [f#4,a4]] [~ ~ ~ [g4,b4] ~ ~ ~ [b4,d5]] [~ ~ ~ [g#4,b4] ~ ~ ~ [a4,c#5]] [~ ~ ~ [c#4,e4] ~ ~ ~ [a4,c#5]]>"
+// CHORUS : Bm7 – Em9 – Amaj7 – Dmaj7     (lifts higher into the IV)
+const chorMel   = "<[~ f#4 ~ a4 ~ ~ b4 ~] [~ b4 ~ a4 ~ g4 ~ f#4] [e4 ~ ~ g#4 a4 ~ ~ ~] [~ f#4 ~ a4 ~ c#5 ~ d5]>"
+const chorStab  = "<[~ ~ ~ [f#4,a4] ~ ~ ~ [f#4,a4]] [~ ~ ~ [g4,b4] ~ ~ ~ [b4,d5]] [~ ~ ~ [g#4,b4] ~ ~ ~ [a4,c#5]] [~ ~ ~ [a4,d5] ~ ~ ~ [f#4,a4]]>"
+// BRIDGE : Gmaj7 – Dmaj7 – Cmaj7 – Amaj7 (chord tones only)
+const bridMel   = "<[~ g4 ~ b4 ~ ~ d5 ~] [~ f#4 ~ a4 ~ ~ c#5 ~] [~ e4 ~ g4 ~ ~ b4 ~] [~ e4 ~ g#4 ~ a4 ~ ~]>"
+const bridStab  = "<[~ ~ ~ [g4,b4] ~ ~ ~ [b4,d5]] [~ ~ ~ [f#4,a4] ~ ~ ~ [a4,c#5]] [~ ~ ~ [e4,g4] ~ ~ ~ [g4,b4]] [~ ~ ~ [g#4,b4] ~ ~ ~ [a4,c#5]]>"
+// REFRAIN: F#m9 – Dmaj7 – Amaj7 – E
+const refrMel   = "<[~ c#4 ~ e4 ~ ~ g#4 ~] [~ f#4 ~ a4 ~ ~ c#5 ~] [e4 ~ ~ g#4 a4 ~ ~ ~] [~ b4 ~ g#4 ~ f#4 ~ e4]>"
+const refrStab  = "<[~ ~ ~ [c#4,e4] ~ ~ ~ [e4,g#4]] [~ ~ ~ [f#4,a4] ~ ~ ~ [a4,c#5]] [~ ~ ~ [g#4,b4] ~ ~ ~ [a4,c#5]] [~ ~ ~ [g#4,b4] ~ ~ ~ [e4,g#4]]>"
+
 // ── VERSE — resolves to Amaj7 (I) ─────────────────────────────────────────────
 // Bm7 – Em9 – Amaj7 – F#m7    |   ii – v – I – vi
 const verse = () => stack(
-  note("<[b3,d4,f#4,a4] [e3,g3,b3,d4,f#4] [a3,c#4,e4,g#4] [f#3,a3,c#4,e4]>")
-    .sound("gm_electric_guitar_clean").gain(.55).lpf(2600).room(.35),
+  //note("<[b3,d4,f#4,a4] [e3,g3,b3,d4,f#4] [a3,c#4,e4,g#4] [f#3,a3,c#4,e4]>")
+  //  .sound("gm_epiano1").gain(.55).lpf(2600).room(.35),
   note("<[b1 ~ ~ b1 ~ f#2 ~ ~] [e1 ~ ~ e1 ~ b1 ~ ~] [a1 ~ ~ a1 ~ e2 ~ ~] [f#1 ~ ~ f#1 ~ c#2 ~ e2]>")
     .sound("sawtooth").lpf(760).gain(.6),
   s("bd ~ ~ bd ~ ~ bd ~").gain(.7).lpf(3000).bank("RolandTR808"),
   s("~ ~ ~ ~ rim ~ ~ ~").gain(.5).room(.25).bank("RolandTR808"),
-  s("hh*8").gain("[.4 .28]*4").bank("RolandTR808")
+  s("hh*8")
+    .add(note(perlin.range(0, 0.02)))     // shimmer on hi-hats
+    .gain("[.4 .28]*4").bank("RolandTR808"),
+horns(verseMel, verseStab)
 ).swingBy(1/3, 8)
 
 // ── CHORUS — lifts to Dmaj7 (IV) ──────────────────────────────────────────────
@@ -74,7 +105,8 @@ s("~ ~ ~ ~ rim ~ ~ ~")
     .gain(.5).room(.25).bank("RolandTR808"),
 s("hh*8")
     .add(note(perlin.range(0, 0.02)))     // shimmer on hi-hats
-    .gain("[.4 .28]*4").bank("RolandTR808")
+    .gain("[.4 .28]*4").bank("RolandTR808"),
+horns(verseMel, verseStab)                 // brass section: shared melody + trombone stabs
 ).swingBy(1/3, 8)
  
 // ── CHORUS — lifts to Dmaj7 (IV) ──────────────────────────────────────────────
@@ -94,9 +126,10 @@ s("bd ~ ~ bd ~ ~ bd ~")
     .gain(.75).lpf(3000).bank("RolandTR808"),
 s("~ ~ ~ ~ rim ~ ~ ~")
     .gain(.55).room(.25).bank("RolandTR808"),
-s("hh*8")
+s("~ hh hh hh hh hh hh hh")
     .add(note(perlin.range(0, 0.025)))    // more shimmer in chorus
-    .gain("[.45 .32]*4").bank("RolandTR808")
+    .gain("[.45 .32]*4").bank("RolandTR808"),
+horns(chorMel, chorStab)                   // brass section: shared melody + trombone stabs
 ).swingBy(1/3, 8)
  
 // ── BRIDGE — Mixolydian lift, floats out via ♭VII / chromatic ♭III ────────────
@@ -116,9 +149,10 @@ s("bd ~ ~ bd ~ ~ bd ~")
     .gain(.55).lpf(3200).bank("RolandTR808"),
 s("~ ~ ~ ~ rim ~ ~ ~")
     .gain(.35).room(.3).bank("RolandTR808"),
-s("hh*8")
+s("~ ~ hh hh hh hh hh hh")
     .add(note(perlin.range(0, 0.03)))     // aerial shimmer
-    .gain("[.3 .18]*4").bank("RolandTR808")
+    .gain("[.3 .18]*4").bank("RolandTR808"),
+horns(bridMel, bridStab)                   // brass section: shared melody + trombone stabs
 ).swingBy(1/3, 8)
  
 // ── REFRAIN — drops to the relative minor (F#m as home) ───────────────────────
@@ -140,13 +174,15 @@ s("~ ~ ~ ~ rim ~ ~ ~")
     .gain(.35).room(.3).bank("RolandTR808"),
 s("hh*8")
     .add(note(perlin.range(0, 0.02)))     // soft shimmer
-    .gain("[.3 .18]*4").bank("RolandTR808")
+    .gain("[.3 .18]*4").bank("RolandTR808"),
+horns(refrMel, refrStab)                   // brass section: shared melody + trombone stabs
 ).swingBy(1/3, 8)
 
 
 // ── ARRANGEMENT — each [n, section] plays that section for n bars ──────────────
 arrange(
-  [8, lush_verse()],
+  [4, verse()],
+  [4, lush_verse()],
   [8, lush_chorus()],
   [4, lush_refrain()], 
   [8, lush_verse()],
