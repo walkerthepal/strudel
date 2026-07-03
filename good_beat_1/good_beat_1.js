@@ -31,12 +31,24 @@ const chorus = () => stack(
   s("hh*8").gain("[.45 .32]*4").bank("RolandTR808")
 ).swingBy(1/3, 8)
 
-// ── BRIDGE SECTION — deceptive turn to F#m7 (vi) ──────────────────────────────
-// Bm7 – Em9 – Amaj7 – F#m7    |   ii – v – I – vi
-const bridgeSection = () => stack(
-  note("<[b3,d4,f#4,a4] [e3,g3,b3,d4,f#4] [a3,c#4,e4,g#4] [f#3,a3,c#4,e4]>")
+// ── BRIDGE — Mixolydian lift, floats out via ♭VII / chromatic ♭III ────────────
+// Gmaj7 – Dmaj7 – Cmaj7 – Amaj7   |   ♭VII – IV – ♭III – I  (C is the surprise)
+const bridge = () => stack(
+  note("<[g3,b3,d4,f#4] [d3,f#3,a3,c#4] [c3,e3,g3,b3] [a3,c#4,e4,g#4]>")
+    .sound("gm_epiano1").gain(.5).lpf(2500).room(.45),
+  note("<g1 d1 c1 a1>")
+    .sound("sawtooth").lpf(420).gain(.55),
+  s("bd ~ ~ bd ~ ~ bd ~").gain(.55).lpf(3200).bank("RolandTR808"),
+  s("~ ~ ~ ~ rim ~ ~ ~").gain(.35).room(.3).bank("RolandTR808"),
+  s("hh*8").gain("[.3 .18]*4").bank("RolandTR808")
+).swingBy(1/3, 8)
+
+// ── REFRAIN — drops to the relative minor (F#m as home) ───────────────────────
+// F#m9 – Dmaj7 – Amaj7 – E   |   i – VI – III – VII  in F# Aeolian
+const refrain = () => stack(
+  note("<[f#3,a3,c#4,e4,g#4] [d3,f#3,a3,c#4] [a3,c#4,e4,g#4] [e3,g#3,b3,d4]>")
     .sound("gm_epiano1").gain(.5).lpf(2500).room(.4),
-  note("<b1 e1 a1 f#1>")
+  note("<f#1 d1 a1 e1>")
     .sound("sawtooth").lpf(420).gain(.55),
   s("bd ~ ~ bd ~ ~ bd ~").gain(.55).lpf(3200).bank("RolandTR808"),
   s("~ ~ ~ ~ rim ~ ~ ~").gain(.35).room(.3).bank("RolandTR808"),
@@ -45,14 +57,15 @@ const bridgeSection = () => stack(
 
 // ── ARRANGEMENT — each [n, section] plays that section for n bars ──────────────
 arrange(
-  [8, verse()],         // Verse 1
-  [8, chorus()],        // Chorus 1
-  [8, verse()],         // Verse 2
-  [8, chorus()],        // Chorus 2
-  [4, verse()],         // Bridge: A
-  [4, verse()],         //         A
-  [4, bridgeSection()], //         C
-  [4, bridgeSection()], //         C
-  [4, chorus()],        //         B
-  [8, chorus()]         // Final Chorus
+  [8, verse()],
+  [8, chorus()],
+  [4, refrain()], 
+  [8, verse()],
+  [8, chorus()],
+  [4, refrain()], 
+  [4, verse()],
+  [8, chorus()],
+  [4, refrain()],
+  [4, bridge()],
+  [8, chorus()],
 )
