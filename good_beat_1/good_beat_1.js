@@ -12,8 +12,8 @@ setcpm(84/4)
 const verse = () => stack(
   note("<[b3,d4,f#4,a4] [e3,g3,b3,d4,f#4] [a3,c#4,e4,g#4] [f#3,a3,c#4,e4]>")
     .sound("gm_electric_guitar_clean").gain(.55).lpf(2600).room(.35),
-  note("<b1 e1 a1 a1>")
-    .sound("sawtooth").lpf(420).gain(.6), 
+  note("<[b1 ~ ~ b1 ~ f#2 ~ ~] [e1 ~ ~ e1 ~ b1 ~ ~] [a1 ~ ~ a1 ~ e2 ~ ~] [f#1 ~ ~ f#1 ~ c#2 ~ e2]>")
+    .sound("sawtooth").lpf(760).gain(.6),
   s("bd ~ ~ bd ~ ~ bd ~").gain(.7).lpf(3000).bank("RolandTR808"),
   s("~ ~ ~ ~ rim ~ ~ ~").gain(.5).room(.25).bank("RolandTR808"),
   s("hh*8").gain("[.4 .28]*4").bank("RolandTR808")
@@ -24,8 +24,8 @@ const verse = () => stack(
 const chorus = () => stack(
   note("<[b3,d4,f#4,a4] [e3,g3,b3,d4,f#4] [a3,c#4,e4,g#4] [d3,f#3,a3,c#4]>")
     .sound("gm_electric_guitar_clean").gain(.55).lpf(2600).room(.35),
-  note("<b1 e1 a1 d2>")
-    .sound("sawtooth").lpf(420).gain(.6),
+  note("<[b1 ~ ~ b1 f#2 ~ ~ b2] [e1 ~ ~ e1 b1 ~ ~ e2] [a1 ~ ~ a1 e2 ~ ~ a2] [d2 ~ ~ d2 a1 ~ ~ d2]>")
+    .sound("sawtooth").lpf(760).gain(.6),
   s("bd ~ ~ bd ~ ~ bd ~").gain(.75).lpf(3000).bank("RolandTR808"),
   s("~ ~ ~ ~ rim ~ ~ ~").gain(.55).room(.25).bank("RolandTR808"),
   s("hh*8").gain("[.45 .32]*4").bank("RolandTR808")
@@ -36,8 +36,8 @@ const chorus = () => stack(
 const bridge = () => stack(
   note("<[g3,b3,d4,f#4] [d3,f#3,a3,c#4] [c3,e3,g3,b3] [a3,c#4,e4,g#4]>")
     .sound("gm_electric_guitar_clean").gain(.5).lpf(2500).room(.45),
-  note("<g1 d1 c1 a1>")
-    .sound("sawtooth").lpf(420).gain(.55),
+  note("<[g1 ~ ~ g1 ~ d2 ~ ~] [d1 ~ ~ d1 ~ a1 ~ ~] [c1 ~ ~ c1 ~ g1 ~ ~] [a1 ~ ~ a1 ~ e2 ~ ~]>")
+    .sound("sawtooth").lpf(760).gain(.55),
   s("bd ~ ~ bd ~ ~ bd ~").gain(.55).lpf(3200).bank("RolandTR808"),
   s("~ ~ ~ ~ rim ~ ~ ~").gain(.35).room(.3).bank("RolandTR808"),
   s("hh*8").gain("[.3 .18]*4").bank("RolandTR808")
@@ -48,8 +48,8 @@ const bridge = () => stack(
 const refrain = () => stack(
   note("<[f#3,a3,c#4,e4,g#4] [d3,f#3,a3,c#4] [a3,c#4,e4,g#4] [e3,g#3,b3,d4]>")
     .sound("gm_electric_guitar_clean").gain(.5).lpf(2500).room(.4),
-  note("<f#1 d1 a1 e1>")
-    .sound("sawtooth").lpf(420).gain(.55),
+  note("<[f#1 ~ ~ ~ c#2 ~ f#1 ~] [d1 ~ ~ ~ a1 ~ d1 ~] [a1 ~ ~ ~ e2 ~ a1 ~] [e1 ~ ~ ~ b1 ~ e1 e2]>")
+    .sound("sawtooth").lpf(760).gain(.55),
   s("bd ~ ~ bd ~ ~ bd ~").gain(.55).lpf(3200).bank("RolandTR808"),
   s("~ ~ ~ ~ rim ~ ~ ~").gain(.35).room(.3).bank("RolandTR808"),
   s("hh*8").gain("[.3 .18]*4").bank("RolandTR808")
@@ -63,11 +63,11 @@ note("<[b3,d4,f#4,a4] [e3,g3,b3,d4,f#4] [a3,c#4,e4,g#4] [f#3,a3,c#4,e4]>")
     .vib(4.5)                          // 4.5 Hz vib
     .vibmod(0.06)                          // ±0.06 depth (subtle but present)
     .sound("gm_electric_guitar_clean").gain(.55).lpf(2600).room(.35),
-note("<b1 e1 a1 a1>")
+note("<[b1 ~ ~ b1 ~ f#2 ~ ~] [e1 ~ ~ e1 ~ b1 ~ ~] [a1 ~ ~ a1 ~ e2 ~ ~] [f#1 ~ ~ f#1 ~ c#2 ~ e2]>")
     .add(note(perlin.range(0, 0.05)))     // slightly deeper warble on bass
     .vib(3.5)                          // slower vib for weight
     .vibmod(0.07)
-    .sound("sawtooth").lpf(420).gain(.6), 
+    .sound("sawtooth").lpf(760).gain(.6),
 s("bd ~ ~ bd ~ ~ bd ~")
     .gain(.7).lpf(3000).bank("RolandTR808"),
 s("~ ~ ~ ~ rim ~ ~ ~")
@@ -85,11 +85,11 @@ note("<[b3,d4,f#4,a4] [e3,g3,b3,d4,f#4] [a3,c#4,e4,g#4] [d3,f#3,a3,c#4]>")
     .vib(5)                            // brighter, faster vib for lift
     .vibmod(0.065)                         // slightly deeper
     .sound("gm_electric_guitar_clean").gain(.55).lpf(2600).room(.35),
-note("<b1 e1 a1 d2>")
+note("<[b1 ~ ~ b1 f#2 ~ ~ b2] [e1 ~ ~ e1 b1 ~ ~ e2] [a1 ~ ~ a1 e2 ~ ~ a2] [d2 ~ ~ d2 a1 ~ ~ d2]>")
     .add(note(perlin.range(0, 0.055)))    // more prominent bass warble
     .vib(4)                            // steady, warm
     .vibmod(0.08)
-    .sound("sawtooth").lpf(420).gain(.6),
+    .sound("sawtooth").lpf(760).gain(.6),
 s("bd ~ ~ bd ~ ~ bd ~")
     .gain(.75).lpf(3000).bank("RolandTR808"),
 s("~ ~ ~ ~ rim ~ ~ ~")
@@ -107,11 +107,11 @@ note("<[g3,b3,d4,f#4] [d3,f#3,a3,c#4] [c3,e3,g3,b3] [a3,c#4,e4,g#4]>")
     .vib(5.5)                          // faster vib for unsettled feeling
     .vibmod(0.09)                          // deeper for drama
     .sound("gm_electric_guitar_clean").gain(.5).lpf(2500).room(.45),
-note("<g1 d1 c1 a1>")
+note("<[g1 ~ ~ g1 ~ d2 ~ ~] [d1 ~ ~ d1 ~ a1 ~ ~] [c1 ~ ~ c1 ~ g1 ~ ~] [a1 ~ ~ a1 ~ e2 ~ ~]>")
     .add(note(perlin.range(0, 0.07)))     // prominent warble underscores movement
     .vib(4.5)
     .vibmod(0.1)
-    .sound("sawtooth").lpf(420).gain(.55),
+    .sound("sawtooth").lpf(760).gain(.55),
 s("bd ~ ~ bd ~ ~ bd ~")
     .gain(.55).lpf(3200).bank("RolandTR808"),
 s("~ ~ ~ ~ rim ~ ~ ~")
@@ -129,11 +129,11 @@ note("<[f#3,a3,c#4,e4,g#4] [d3,f#3,a3,c#4] [a3,c#4,e4,g#4] [e3,g#3,b3,d4]>")
     .vib(4)                            // gentle, meditative vib
     .vibmod(0.065)                         // warm but controlled
     .sound("gm_electric_guitar_clean").gain(.5).lpf(2500).room(.4),
-note("<f#1 d1 a1 e1>")
+note("<[f#1 ~ ~ ~ c#2 ~ f#1 ~] [d1 ~ ~ ~ a1 ~ d1 ~] [a1 ~ ~ ~ e2 ~ a1 ~] [e1 ~ ~ ~ b1 ~ e1 e2]>")
     .add(note(perlin.range(0, 0.05)))     // grounded but expressive bass
     .vib(3.5)
     .vibmod(0.075)
-    .sound("sawtooth").lpf(420).gain(.55),
+    .sound("sawtooth").lpf(760).gain(.55),
 s("bd ~ ~ bd ~ ~ bd ~")
     .gain(.55).lpf(3200).bank("RolandTR808"),
 s("~ ~ ~ ~ rim ~ ~ ~")
