@@ -16,6 +16,8 @@
 //   4. Horn stereo image widened: trumpet .25 / french horn .75 (was .4/.6).
 //   5. Outro dissolves instead of hard-stopping: delay + bigger room on the
 //      guitar, and 2 bars of silence appended so the tails actually decay.
+//   6. Epiano melody enters bar 5 of the 8-bar middle verse — octave down,
+//      warm timbre, masks silence on bars 1–4 to fill the vamping stretch.
 // ══════════════════════════════════════════════════════════════════════════════
 setcpm(84 / 4);
 
@@ -347,6 +349,20 @@ const lush_refrain = () =>
     hornMel(refrMel), // soft solo horn — melody only, no stabs
   ).swingBy(REFRAIN_SWING, 8); // drags a hair behind the chorus pocket
 
+// ── VERSE with melody — answer to the 8-bar stretch ──────────────────────────
+// Melody enters bar 5 (second half only), octave down on warm epiano
+const lush_verse_mel = () =>
+  stack(
+    lush_verse(),
+    note(verseMel)
+      .sub(note(12)) // octave down — warm, not leading
+      .sound("gm_epiano1")
+      .gain(0.3)
+      .lpf(2500)
+      .room(0.35)
+      .mask("<0!4 1!4>"), // silent bars 1–4, enters bar 5
+  ).swingBy(VERSE_SWING, 8);
+
 // ── OUTRO — one ringing Amaj9, dissolve into the room ─────────────────────────
 const outro = () =>
   stack(
@@ -365,13 +381,13 @@ const outro = () =>
 // ── ARRANGEMENT — each [n, section] plays that section for n bars ──────────────
 arrange(
   [4, verse()],
-  [4, lush_verse()],
+  [4, lush_verse_mel()],
   [8, lush_chorus()],
   [4, lush_refrain()],
-  [8, lush_verse()],
+  [8, lush_verse_mel()], // CHANGE: melody enters bar 5, fills the 8-bar stretch
   [8, lush_chorus()],
   [4, lush_refrain()],
-  [4, lush_verse()],
+  [4, lush_verse_mel()],
   [8, lush_chorus()],
   [4, lush_refrain()],
   [4, lush_bridge()],
