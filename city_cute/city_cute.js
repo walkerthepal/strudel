@@ -103,7 +103,7 @@ const prechorus = () =>
     lead(preMel, "A4:major"),
   ).swingBy(1 / 8, 8);
 
-const chorus = (v = 1) =>
+const chorus = () =>
   stack(
     drumsBig(),
     triBass(chorProg, "<0 [0 4] 0 [0 2]>*2"),
