@@ -381,7 +381,7 @@ const outro = () =>
 // ── ARRANGEMENT — each [n, section] plays that section for n bars ──────────────
 arrange(
   [4, verse()],
-  [4, lush_verse_mel()],
+  [4, lush_verse()],
   [8, lush_chorus()],
   [4, lush_refrain()],
   [8, lush_verse_mel()], // CHANGE: melody enters bar 5, fills the 8-bar stretch
@@ -392,6 +392,6 @@ arrange(
   [4, lush_refrain()],
   [4, lush_bridge()],
   [8, lush_chorus()],
-  [4, outro()],
-  [2, silence], // tail room — let the delay/reverb decay before the stop
+  [3, outro()],
+  [1, silence], // tail room — let the delay/reverb decay before the stop
 );
