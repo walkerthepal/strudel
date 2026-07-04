@@ -160,56 +160,49 @@ const outro = () =>
   ).swingBy(1 / 8, 8);
 
 // ══════════════════════════════════════════════════════════════════════
-//  VISUALS — HYDRA   (retro 90s city-pop, chunky pixels)
-//  Beat-synced via H() — no detectAudio, no per-frame FFT polling.
-//  Perf setup:
-//    · these double-quoted consts are already pre-parsed into Patterns by
-//      the REPL transpiler — H() gets a Pattern, no per-frame parsing.
-//      Do NOT wrap them in mini(); the transpiler makes that mini(pattern).
-//    · window.fps = 24 (below .out()) caps hydra's render loop; throttled
-//      frames skip uniform evaluation + the GL draw entirely.
-//    · 320x180 buffer; canvas is pixelated:true by default → crisp upscale.
-//  Keep this .out() ABOVE arrange() — the REPL plays the LAST expression.
+//  VISUALS — HYDRA   (night sky: gradient into black + moon, CRT warble)
+//  Two palettes, swapped by a pattern:
+//    0 = deep purple sky · pink moon
+//    1 = deep blue sky   · ice-blue moon
+//  px() mixes each color channel between palette A and B with one H()
+//  uniform — palette is 0 or 1, so a + p*(b-a) lands exactly on a or b.
+//  Everything stays dark so the REPL code on top reads easily.
+//  Keep the .out() ABOVE arrange() — the REPL plays the LAST expression.
 // ══════════════════════════════════════════════════════════════════════
-const punch = "1 0.15 [0.15 1] 0.15"; // kick rhythm — bd on beat 1 + & of 3
-const back = "0.2 0.55 0.2 0.55"; // backbeat — grid flashes on the snare
-const drift = "<0 0.04 0.09 0.14>"; // hue sweep, steps once per bar
+const palette = "<0 1>".slow(4); // ← the swap-rate knob: .slow(4) = every 4 bars
+const px = (a, b) => H(palette.mul(b - a).add(a)); // per-channel palette mix
+const punch = "1 0.2 [0.2 1] 0.2"; // kick — soft pulse on the moon glow only
 
-osc(5, 0.05, 0.9)
-  .color(1.3, 0.55, 0.7) // peach → magenta
-  .hue(H(drift)) // slow palette drift per phrase
-  // ── teal scanline "blinds" scrolling up = the retro grid ────────────
-  .add(
-    osc(26, 0, 0)
-      .rotate(Math.PI / 2)
-      .thresh(0.6, 0.05)
-      .color(0.3, 0.9, 0.85)
-      .scrollY(0, 0.05),
-    H(back), // grid brightens on the backbeat
-  )
-  // ── pulsing sun ─────────────────────────────────────────────────────
-  .add(
-    shape(72, H(punch.mul(0.23).add(0.15)), 0.06) // radius pumps on the kick
-      .color(1.4, 0.75, 0.38)
-      .scale(1, 0.7)
-      .scrollY(-0.12), // modulateScale dropped — extra texture pass, invisible payoff
-    H(punch.mul(0.4).add(0.5)), // brightness pumps too
-  )
-  // ── BIG 8-bit pixels — lower the two numbers = chunkier blocks ───────
-  .pixelate(48, 27) // try 32,18 for mega-chunk / 80,45 finer
-  // ── 90s CRT scanlines + saturation/contrast lift ────────────────────
+// moon position + size knobs (shared by disc and glow)
+const mx = -0.22; // horizontal — flip sign to move it to the other side
+const my = 0.16; // vertical
+const moon = (rad, smooth) =>
+  shape(72, rad, smooth)
+    .scale(1, 1, 16 / 9) // roundness fix — if the moon looks oval, tweak this
+    .scrollX(mx)
+    .scrollY(my)
+    .color(px(1.0, 0.55), px(0.5, 0.8), px(0.72, 1.0)); // pink ↔ ice blue
+
+// ── sky: palette color fading into black ────────────────────────────
+solid(px(0.16, 0.03), px(0.04, 0.07), px(0.24, 0.22)) // purple ↔ deep blue
+  .mult(osc(1.6, 0, 0).rotate(Math.PI / 2)) // vertical fade — raise 1.6 to tighten it
+  // ── moon disc + soft glow (glow breathes gently on the kick) ───────
+  .add(moon(0.13, 0.02), 0.9)
+  .add(moon(0.15, 0.5), H(punch.mul(0.06).add(0.1)))
+  // ── 8-bit blocks ────────────────────────────────────────────────────
+  .pixelate(80, 45) // 48,27 = chunkier · 128,72 = finer
+  // ── CRT warble: the whole pixel grid sways like a worn tube ────────
+  .modulateScrollX(osc(3, 0.15).rotate(Math.PI / 2), 0.004) // 0.004 = subtle; 0.01 = seasick
+  // ── faint scanlines ─────────────────────────────────────────────────
   .mult(
     osc(90, 0, 0)
       .rotate(Math.PI / 2)
-      .brightness(0.15),
-    0.5,
+      .brightness(0.35),
+    0.3,
   )
-  .saturate(1.35)
-  .contrast(1.1)
   .out();
 
 // cap hydra's render loop — hands the main thread back to the scheduler.
-// sandboxed hydra global, synced every rAF. 24 reads as retro; try 15 if needed.
 window.fps = 24;
 
 // ── ARRANGEMENT ───────────────────────────────────────────────────────
