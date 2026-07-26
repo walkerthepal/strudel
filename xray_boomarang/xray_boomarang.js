@@ -8,7 +8,8 @@
 // THE BASS IS THE SONG. It states the hook naked in the intro, carries the
 // verse with no vocal over it, and only hands off in the chorus. Everything
 // else is cleared out of its register — guitar and keys are high-passed,
-// the sub only shows up when the bass moves out of the way.
+// the sub only shows up when the bass moves out of the way. It slurs into
+// its notes with real pitch slides (see vSlide/cSlide/bSlide below).
 // ══════════════════════════════════════════════════════════════════════
 setcpm(104 / 4);
 
@@ -18,8 +19,10 @@ const cProg = chord("<G^9 A13 F#m9 Bm9>").dict("ireal");
 const bProg = chord("<G^9 A13 D^9 [C#m7 F#7]>").dict("ireal");
 
 // tape flutter — everything pitched EXCEPT the bass drifts a few cents.
-// the bass stays dead in tune; that's what makes it the anchor
-const wobble = (x) => x.add(note(perlin.range(-0.08, 0.08).slow(4)));
+// the bass stays dead in tune; that's what makes it the anchor.
+// ±3 cents, slowly: at ±8 it stopped reading as tape and started reading
+// as badly tuned
+const wobble = (x) => x.add(note(perlin.range(-0.03, 0.03).slow(6)));
 const kit = (x) => x.bank("LinnDrum").swingBy(0.09, 8);
 
 // ── DRUMS ─────────────────────────────────────────────────────────────
@@ -60,15 +63,38 @@ const bBassMel =
   "<[0 ~ ~ 2 ~ [1 ~] ~ [~ 3]] [0 ~ [~ 0] 1 ~ [2 3] ~ ~] [0 ~ [~ 2] 4 ~ [3 ~] [~ 2] ~] [0 ~ [~ 2] 1 0 ~ [~ 1] 2]>";
 const oBassMel = "<[0 ~ ~ ~ ~ [1 0] ~ ~] [0 ~ [~ 2] 1 ~ 0 ~ ~]>";
 
+// SLIDES — pitch envelope, in semitones, offset from the true pitch.
+//
+// The envelope MUST be configured panchor(0) + psustain(0). superdough's
+// getParamADSR always ramps back to `min` on note release, so the anchor
+// decides where the note ENDS UP. With panchor(0): min=0, so the note starts
+// `penv` semitones off, decays to true pitch over pdecay, and releases to 0
+// — dead in tune. (panchor(1) inverts that: it arrives in tune and then bends
+// back off-pitch as it rings out. That is what made this sound broken.)
+//
+// Sign = direction of approach:  negative = start flat, slide UP the neck
+//                                positive = start sharp, fall DOWN into it
+// Patterns are step-aligned to the melodies above (8 steps/bar; `@` holds 0
+// across the notes that stay fretted) so only chosen notes slide: phrase
+// starts, the octave leap, and the turnarounds.
+const vSlide = "<[-2 0@7] [0@6 -2 0] [-2 0@6 -3] [2 0@7]>";
+const cSlide = "<[-2 0@7] [0@5 -2 0@2] [-2 0@4 -2 0@2] [0@7 2]>";
+const bSlide = "<[-2 0@6 -2] [0@5 -2 0@2] [0@3 -3 0@4] [0@7 2]>";
+const oSlide = "<[-2 0@7] [-2 0@7]>";
+
 // round, fingered, mid-forward — sits at 120–250Hz where it reads as melody.
 // perlin gain + occasional ghosts = a player, not a sequencer
-const bass = (prog, line = vBassMel, g = 1.0) =>
+const bass = (prog, line = vBassMel, slides = vSlide, g = 1.0, pdec = 0.06) =>
   n(line)
     .set(prog)
     .mode("root:g2")
     .voicing()
     .s("gm_electric_bass_finger")
-    .clip(0.92)
+    .clip(0.96) // notes just touch — the line slurs instead of articulating
+    .penv(slides)
+    .panchor(0) // resolve TO pitch and stay — see the note above
+    .psustain(0)
+    .pdecay(pdec) // slide time; no pattack, so the bend starts instantly
     .lpf(1900)
     .room(0.1)
     .gain(perlin.range(g - 0.14, g).slow(3))
@@ -97,23 +123,30 @@ const gtr = (prog, st = "~ x ~ x ~ x ~ [x x]", g = 0.42, voices = "[0,1,2,3]") =
     .struct(st)
     .clip(0.22)
     .phaser(2)
-    .hpf(320)
+    .hpf(180) // guitar's lowest is ~247Hz; this is insurance, not a carve
     .lpf(2700)
     .gain(g)
     .pan(0.62)
     .room(0.25)
     .apply(wobble);
 
-const keys = (prog, g = 0.26) =>
-  n("[0,1,2,3]")
+// voices "[1,2,3]" drops the voicing's LOWEST note. That bottom voice sat
+// around 185Hz — right on top of the bass's upper range — so losing it is
+// what separates the pad from the bassline. Top note is unchanged (anchor
+// mode is `below`), so the pad keeps its register and just stops competing.
+const keys = (prog, g = 0.35, voices = "[1,2,3]") =>
+  n(voices)
     .set(prog)
-    .anchor("F#4")
+    .anchor("F#4") // voicing mode is `below`: top note <= F#4, so ~185-370Hz
     .voicing()
     .s("gm_epiano1")
     .attack(0.02)
     .release(0.9)
     .phaser(4)
-    .hpf(380)
+    // 150, not 380 — the bass only occupies 123-247Hz and the sub sits below
+    // that, so this clears them without touching the chord. At 380 this was
+    // filtering ABOVE the voicing's own top note and gutting the part.
+    .hpf(150)
     .lpf(1900)
     .gain(g)
     .pan(0.38)
@@ -129,7 +162,10 @@ const lead = (mel, sc = "B4:dorian", g = 0.32) =>
     .attack(0.05)
     .release(0.35)
     .clip(0.95)
-    .vib("4:.12")
+    // no pitch envelope here. a scoop on every note + vibrato + tape drift
+    // stacks into permanent warble — the lead reads as sung from the soft
+    // attack and the vibrato alone
+    .vib("3.5:.05")
     .lpf(2200)
     .gain(g)
     .pan(0.55)
@@ -162,7 +198,7 @@ const verse = (mel = null) =>
     fill(),
     bass(vProg),
     gtr(vProg, "~ ~ ~ x ~ ~ ~ [~ x]", 0.28, "[2,3]"),
-    keys(vProg, 0.2),
+    keys(vProg, 0.31),
     mel ? lead(mel, "B4:dorian", 0.22) : silence,
   );
 
@@ -170,10 +206,12 @@ const verse = (mel = null) =>
 const chorus = () =>
   stack(
     drumsBig(),
-    bass(cProg, cBassMel),
+    bass(cProg, cBassMel, cSlide),
     sub(cProg),
-    gtr(cProg, "[~ x]*4", 0.44),
-    keys(cProg, 0.3),
+    // thinned like the Rhodes — drops the guitar's bottom voice out of the
+    // pad's core so the two stop stacking in the same 250-370Hz band
+    gtr(cProg, "[~ x]*4", 0.44, "[1,2,3]"),
+    keys(cProg, 0.39),
     leadWide(chorMel),
   );
 
@@ -182,9 +220,9 @@ const bridge = () =>
   stack(
     drums(),
     fill(),
-    bass(bProg, bBassMel),
+    bass(bProg, bBassMel, bSlide),
     sub(bProg),
-    keys(bProg, 0.2),
+    keys(bProg, 0.31),
     lead(bridMel, "B4:dorian", 0.34),
   );
 
@@ -192,8 +230,9 @@ const bridge = () =>
 const outro = () =>
   stack(
     s("bd ~ ~ ~ ~ ~ bd ~ ~ ~ bd ~ ~ ~ ~ ~").gain(0.66).lpf(1500).apply(kit),
-    bass(vProg, oBassMel, 0.92),
-    keys(vProg, 0.14),
+    // longer pdecay — the slides go lazy as the track winds down
+    bass(vProg, oBassMel, oSlide, 0.92, 0.1),
+    keys(vProg, 0.22),
   );
 
 // tape hiss lives outside the arrangement — never marks the loop point
