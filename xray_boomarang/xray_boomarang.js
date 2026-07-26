@@ -45,11 +45,8 @@ const fill = () =>
 const drumsBig = () =>
   stack(
     drums(),
-    // colour on the snare, not a second backbeat. at 0.26 this stacked to
-    // ~0.9 against the 0.64 snare — a 3dB jump on 2 and 4 that read as "the
-    // drums got louder at the chorus" rather than as a wider snare
     s("~ ~ ~ ~ cp ~ ~ ~ ~ ~ ~ ~ cp ~ ~ ~")
-      .gain(0.14)
+      .gain(0.26)
       .bank("RolandTR808")
       .room(0.3),
     fill(),
@@ -103,18 +100,8 @@ const bass = (prog, line = vBassMel, slides = vSlide, g = 1.0, pdec = 0.06) =>
     .gain(perlin.range(g - 0.14, g).slow(3))
     .sometimesBy(0.12, (x) => x.gain(0.5));
 
-// sub only in the big sections — in the verse the bass owns the bottom alone.
-//
-// It SWELLS IN rather than switching on. A ~50Hz sine is the single biggest
-// energy source in the mix, so arriving at full level on a downbeat reads as
-// the whole track getting louder instead of the section opening up. That is
-// survivable at chorus 1 (first lift of the song) but clunky at chorus 2,
-// where the sub has been gone for all eight bars of verse 2. Two bars of ramp
-// and the same arrival lands as depth. Section-local cycles restart at 0 in
-// arrange(), so this `<>` per-bar ramp aligns to whatever section it's in.
-const subIn = "<.12 .22 .3 .3 .3 .3 .3 .3>";
-
-const sub = (prog, g = 0.3) =>
+// sub only in the big sections — in the verse the bass owns the bottom alone
+const sub = (prog) =>
   n("0 ~ ~ 0 ~ ~ ~ ~")
     .set(prog)
     .mode("root:a1")
@@ -124,7 +111,7 @@ const sub = (prog, g = 0.3) =>
     .release(0.18)
     .clip(0.9)
     .lpf(210)
-    .gain(g);
+    .gain(0.42);
 
 // ── CHORDS (high-passed — they live above the bass, never under it) ────
 const gtr = (prog, st = "~ x ~ x ~ x ~ [x x]", g = 0.42, voices = "[0,1,2,3]") =>
@@ -168,9 +155,7 @@ const keys = (prog, g = 0.35, voices = "[1,2,3]") =>
 
 // ── LEAD ──────────────────────────────────────────────────────────────
 // breathy triangle — sits like a hummed vocal. absent from verse 1 entirely
-// rm/dly are parameters because the verse counter-line needs to be drier than
-// the chorus hook — see the call in verse()
-const lead = (mel, sc = "B4:dorian", g = 0.32, rm = 0.45, dly = 0.22) =>
+const lead = (mel, sc = "B4:dorian", g = 0.32) =>
   n(mel)
     .scale(sc)
     .s("triangle")
@@ -184,8 +169,8 @@ const lead = (mel, sc = "B4:dorian", g = 0.32, rm = 0.45, dly = 0.22) =>
     .lpf(2200)
     .gain(g)
     .pan(0.55)
-    .room(rm)
-    .delay(dly)
+    .room(0.45)
+    .delay(0.22)
     .delaytime(0.375)
     .delayfeedback(0.3)
     .apply(wobble);
@@ -214,32 +199,19 @@ const verse = (mel = null) =>
     bass(vProg),
     gtr(vProg, "~ ~ ~ x ~ ~ ~ [~ x]", 0.28, "[2,3]"),
     keys(vProg, 0.31),
-    // accompaniment, not a hook — this has to stay UNDER the bass. The line
-    // climbs to C#6/B5 at the top of each 4-bar phrase, which is right in the
-    // ear's most sensitive band, so at 0.22 and fully wet it bloomed into the
-    // space and read as the whole mix swelling ~7 bars into the section.
-    // Quieter and much drier, it stays the thin line it's supposed to be.
-    mel ? lead(mel, "B4:dorian", 0.15, 0.28, 0.1) : silence,
+    mel ? lead(mel, "B4:dorian", 0.22) : silence,
   );
 
-// the handoff — voice takes the tune, bass gets busier underneath it.
-// subG: ramp the sub in wherever it's been absent (i.e. after a verse); pass
-// a flat level for the last chorus, where it's already sounding out of the
-// bridge and a re-ramp would read as a dip at the biggest moment in the song
-const chorus = (subG = subIn) =>
+// the handoff — voice takes the tune, bass gets busier underneath it
+const chorus = () =>
   stack(
     drumsBig(),
     bass(cProg, cBassMel, cSlide),
-    sub(cProg, subG),
+    sub(cProg),
     // thinned like the Rhodes — drops the guitar's bottom voice out of the
-    // pad's core so the two stop stacking in the same 250-370Hz band.
-    // 0.34, not 0.44: the struct already goes from 2 hits/bar to 4 and picks
-    // up a third voice, so the part doubles in energy without touching the
-    // fader. Riding both at once was the largest single step into the chorus.
-    gtr(cProg, "[~ x]*4", 0.34, "[1,2,3]"),
-    // level-matched to the verse (0.31). The chorus voicing sits higher on
-    // its own; it doesn't need to be louder too.
-    keys(cProg, 0.32),
+    // pad's core so the two stop stacking in the same 250-370Hz band
+    gtr(cProg, "[~ x]*4", 0.44, "[1,2,3]"),
+    keys(cProg, 0.39),
     leadWide(chorMel),
   );
 
@@ -273,14 +245,7 @@ $: arrange(
   [8, verse(verseCounter)],
   [8, chorus()],
   [4, bridge()],
-  [8, chorus(0.3)], // sub carried in from the bridge — no re-entry, no ramp
+  [8, chorus()],
   [4, outro()],
   [2, silence],
-  // MASTER HEADROOM. Strudel gains are linear multipliers that SUM across the
-  // stack, and a chorus runs ~10 simultaneous voices (kick, snare, clap, hats,
-  // bass, sub, 3 guitar voices, 3 key voices, 2 lead layers). Those add up
-  // past 1.0, so the loudest passages were clipping — and clipping FLATTENS
-  // the loud parts, which is why the level jumps read smaller in the browser
-  // (squashed on the way out) than in the .wav export. Trim the whole mix so
-  // the peaks fit and the balance is actually the one set above.
-).postgain(0.3);
+);
