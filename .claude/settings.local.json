@@ -3,7 +3,8 @@
     "allow": [
       "WebFetch(domain:strudel.cc)",
       "Read(//Users/walker/Developer/music/strudel/**)",
-      "Read(//Users/walker/Developer/music/**)"
+      "Read(//Users/walker/Developer/music/**)",
+      "Bash(grep -oE \"[a-zA-Z_]{0,20}early[a-zA-Z_]{0,20}\" dist/strudel.js)"
     ]
   }
 }
