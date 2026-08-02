@@ -43,23 +43,44 @@
 // and it leaves the flute carrying the piece over almost no drums. If it does
 // not work, the melody is where to look — not the mix.
 //
-// WHAT CHANGED, AND WHY IT WASN'T MOVING BEFORE: IT WAS AUTUMN. The first
-// version was correct and airless. Everything above 5.4kHz was gone, the
-// reverbs were dark on every bus, and with no hats in two thirds of the track
-// there was nothing at all in the top octave — so the borrowed Cm9, which is
-// already the saddest thing in the piece, had a mix agreeing with it from
-// every direction. It read as October. Four things moved, none of them
-// harmonic: the console lowpass opened from 5.4k to 7.6k, the comp and lead
-// reverbs got brighter and wider, a shaker went in as air, and the marimba
-// got an octave-up sparkle in the register nothing else was using.
+// WHAT CHANGED, AND WHY IT WASN'T MOVING BEFORE: THE FLUTE HAD NO LONG NOTES.
+// Every melody used to be written `b4 ~ a4 b4 d5 ~ ~ ~`, and that does not
+// hold the d5 — in mini-notation it is a short eighth followed by three
+// rests. So the instrument carrying this entire track was playing detached
+// eighth notes with holes between them. It sounded like a music box rather
+// than a flute, and no amount of reverb was ever going to fix it, because
+// the notes were not there long enough to reverberate. Every melody is now
+// written with `@` elongation: `c5@4 eb5@4` genuinely sustains each note for
+// two full beats.
 //
-// The Cm9 did not move and is not going to. It is still bar 3 and it is
-// still the point. What changed is that it is now the one dark thing in a
-// bright room instead of the loudest voice in a dark one — which is the
-// difference between leaving for good and the last week of August. That
-// contrast is also why the bridge is the only section with NO shaker and no
-// sparkle: eight bars where the air goes out is worth more now than it was
-// when every section sounded like that anyway.
+// That fix cascaded. The old melodies all shared one rhythm — activity in the
+// first half of the bar, silence in the second, four bars in a row — so no
+// phrase ever crossed a barline and each one was four separate gestures
+// instead of a single arc. The rewrites vary where a phrase enters and where
+// it lands. PORCH now rests through beat 1 completely and answers the marimba
+// instead of starting on top of it, and the eb5 in bar 3 gets two whole beats
+// where it used to get one eighth. The most important note in the track was
+// the shortest one in it.
+//
+// Three smaller changes follow the same principle — length and shape before
+// addition. The bass now STOPS in bar 3, holding a single note through the
+// whole Cm9 instead of walking across it; since that root is identical to the
+// C^9 before it, the bass going still is what makes the chord change audible
+// at all. The marimba became a two-bar phrase with an accent contour instead
+// of eight identical eighths forever. And the kick gained exactly one note —
+// on the last eighth of every fourth bar — so phrases push into each other.
+//
+// AND ONE THING CAME OUT. The sparkle was in OUTSIDE as well as both later
+// PORCHes, which put it in five sections out of seven and stopped it being an
+// event at all. OUTSIDE already has hats and pizzicato covering that
+// register. Taking it out there is what makes it mean something in the two
+// places it stayed.
+//
+// The Cm9 did not move and is not going to. It is still bar 3 and it is still
+// the point — now the one dark thing in a bright room rather than the loudest
+// voice in a dark one, which is the difference between leaving for good and
+// the last week of August. That is also why the bridge is the only section
+// with no shaker and no sparkle: eight bars where the air goes out.
 //
 // If the file plays but sounds like a piano, suspect the soundfont names
 // first: gm_flute and gm_pizzicato_strings fall back silently when a build
@@ -130,8 +151,16 @@ const busLead = (x) => x.orbit(4).roomsize(4.2).roomlp(7400); // wide daylight
 // that is not on a beat, so it is what keeps 100bpm from reading as a
 // metronome. Putting the kick on 1 and 3 flat sounded like a drum machine
 // demo.
+// THE ONE EXTRA NOTE. Bars 1–3 are identical; bar 4 adds a single kick on the
+// last eighth, which shoves the phrase into the next one instead of letting
+// it stop politely at the barline. It is the only drum variation in the whole
+// track and it is deliberately at the phrase boundary — a fill every bar is
+// somebody demonstrating that they can fill.
 const kit = (g = 0.42) =>
-  stack(s("bd ~ ~ ~ ~ bd ~ ~").velocity("1 0.68"), s("~ ~ rim ~").velocity(0.8))
+  stack(
+    s("<[bd ~ ~ ~ ~ bd ~ ~]!3 [bd ~ ~ ~ ~ bd ~ bd]>").velocity("1 0.68"),
+    s("~ ~ rim ~").velocity(0.8),
+  )
     .bank("LinnDrum")
     .gain(g)
     .apply(gba)
@@ -173,7 +202,12 @@ const shaker = (g = 0.16) =>
     .apply(busComp);
 
 // ── BASS ──────────────────────────────────────────────────────────────
-const porchBass = "<[0 ~ 0 ~] [0 ~ 0 ~] [0 ~ 0 ~] [0 ~ 2 1]>";
+// THE BASS STOPS IN BAR 3. C^9 and Cm9 have the SAME ROOT, so across bars 2
+// and 3 the bass has nothing to say — it was playing the identical figure
+// twice while the most important harmonic event in the track happened above
+// it, which buried the change. Now it holds one long note through the whole
+// Cm9 and gets out of the way. Going still is louder than walking here.
+const porchBass = "<[0 ~ 0 ~] [0 ~ 0 ~] [0] [0 ~ 2 1]>";
 const outBass = "<[0 ~ 0 2] [0 ~ 0 2] [0 ~ 1 2] [0 ~ 0 ~]>";
 const bridBass =
   "<[0 ~ ~ ~] [0 ~ 0 2] [0 ~ ~ ~] [0 ~ 0 2] [0 ~ ~ ~] [0 ~ 0 2] [0 ~ 0 ~] [0 ~ 2 1]>";
@@ -204,13 +238,25 @@ const bass = (prog, g = 0.88, line = porchBass) =>
 // the missing hi-hats are not providing — it works because it has no sustain,
 // so eight notes a bar read as motion rather than as a chord pad. A Rhodes
 // playing this exact line was mush.
-const marimba = (prog, g = 0.36, line = "0 1 2 3 4 3 2 1", anch = "G4") =>
+// A TWO-BAR PHRASE, NOT A LOOP. This was eight identical eighths, every bar,
+// for fifty bars — correct as a pulse and exhausting as music. Bar 2 now
+// turns around lower and leaves two gaps, which is where the flute's held
+// notes get to be heard. The velocity contour accents beats 1 and 3; a flat
+// mallet line is the sound of a sequencer, and this is the cheapest possible
+// fix for it.
+const marimba = (
+  prog,
+  g = 0.36,
+  line = "<[0 1 2 3 4 3 2 1] [0 1 2 3 2 ~ 1 ~]>",
+  anch = "G4",
+) =>
   n(line)
     .set(prog)
     .anchor(anch)
     .voicing()
     .s("gm_marimba")
     .clip(0.62)
+    .velocity("[1 0.55 0.72 0.55]*2")
     .gain(g)
     .pan(0.42)
     .apply(gba)
@@ -272,42 +318,53 @@ const flute = (mel, g = 0.5) =>
     .apply(busLead);
 
 // ── MELODIES ──────────────────────────────────────────────────────────
-// PORCH. Stepwise, small range, lands on the 3rd — a tune somebody could hum
-// without knowing the chords. Bar 3 is the eb5: the borrowed note over the
-// borrowed chord, approached from c5 and left by step down to d5, so it
-// arrives as a colour rather than as an accident.
+// Everything here uses `@` weights, and the weights in each bar sum to 8, so
+// one unit is an eighth note. `d5@3` is a dotted quarter that actually rings
+// for a dotted quarter. This is the difference between a flute part and a
+// glockenspiel part, and getting it wrong the first time is most of why the
+// old version sat still.
+//
+// PORCH. Rests through the whole of beat 1 — the marimba and the bass get the
+// downbeat, and the flute answers them rather than talking over them. Three
+// stepping eighths, then it lands on d5 and holds. Bar 3 is the point of the
+// track: c5 for two beats, then eb5 for two beats, the borrowed note over the
+// borrowed chord with nothing else moving. It used to be one eighth long.
 const porchMel =
-  "<[b4 ~ a4 b4 d5 ~ ~ ~] [e5 ~ d5 ~ b4 ~ ~ ~] [c5 ~ eb5 ~ d5 ~ ~ ~] [b4 ~ ~ a4 ~ g4 ~ ~]>";
+  "<[~ ~ b4 a4 b4 d5@3] [e5@3 d5@2 b4@3] [c5@4 eb5@4] [d5@2 b4@3 a4 g4@2]>";
 
-// PORCH′. Same skeleton, sitting higher and reaching g5 in bar 2 — so the eb5
-// in bar 3 is now a step DOWN into the ache instead of up into it. Same
-// chord, opposite gesture, no new material.
+// PORCH′. Same rhythm, higher, reaching g5 at the top of bar 2 — so the eb5
+// in bar 3 is arrived at from ABOVE, a step down into the ache instead of up
+// into it. Same chord, opposite gesture, no new material. It ends on b4
+// rather than g4 because another section follows and a full resolution here
+// would close a door the arrangement still needs open.
 const porchMel2 =
-  "<[d5 ~ b4 d5 g5 ~ ~ ~] [g5 ~ f#5 ~ e5 ~ ~ ~] [f5 ~ eb5 ~ d5 ~ ~ ~] [b4 ~ ~ d5 ~ b4 ~ ~]>";
+  "<[~ ~ d5 b4 d5 g5@3] [g5@3 f#5@2 e5@3] [f5@4 eb5@4] [d5@2 b4@3 d5 b4@2]>";
 
-// OUTSIDE. Opens upward, which is the whole point of the section. Bar 3 is
-// the suspension the chord symbol does not spell: g4 held over the D7,
-// dropping to f#4 late.
+// OUTSIDE. Opens upward — the whole reason the section exists. Bar 3 is the
+// suspension the chord symbol refuses to spell: g4 held for two and a half
+// beats over the D7, dropping to f#4 only at the end. That is a voice
+// hesitating, and it only works because the g4 genuinely sustains.
 const outMel =
-  "<[g4 ~ a4 b4 ~ ~ e5 ~] [d5 ~ c5 ~ b4 ~ a4 ~] [g4 ~ ~ ~ f#4 ~ ~ ~] [g4 ~ b4 ~ ~ ~ ~ ~]>";
+  "<[g4@2 a4 b4@2 e5@3] [d5@2 c5@2 b4@2 a4@2] [g4@5 f#4@3] [g4@3 b4@5]>";
 
-// OUTSIDE′. Same shape a third higher, holding the last note for a whole bar
-// because it is the last thing the flute plays in the track.
+// OUTSIDE′. Same shape a third higher, ending on a single note held for the
+// entire bar, because it is the last thing the flute plays in the track.
 const outMel2 =
-  "<[b4 ~ d5 e5 ~ ~ g5 ~] [f#5 ~ e5 ~ d5 ~ c5 ~] [b4 ~ ~ ~ a4 ~ ~ ~] [b4 ~ ~ ~ ~ ~ ~ ~]>";
+  "<[b4@2 d5 e5@2 g5@3] [f#5@2 e5@2 d5@2 c5@2] [b4@5 a4@3] [b4@8]>";
 
-// BRIDGE. Eight bars with no G major in them. It leans on eb5, ab4 and bb4 —
-// the three notes PORCH can never play — and ends on f#4 alone, the only
+// BRIDGE. Eight bars with no G major anywhere in them, leaning on eb5, ab4
+// and bb4 — the three notes PORCH can never play. Bar 7 rests through the
+// first half, which is the only silence of that length in the track and is
+// there to make the last bar land: f#4 alone, held for four beats, the one
 // leading tone in the section and the entire reason PORCH″ feels like home.
 const bridMel =
-  "<[eb5 ~ d5 ~ c5 ~ ~ ~] [g4 ~ ~ ~ bb4 ~ c5 ~] [eb5 ~ ~ ~ c5 ~ ~ ~] [d5 ~ ~ ~ f5 ~ ~ ~] [eb5 ~ c5 ~ ab4 ~ ~ ~] [g4 ~ ~ bb4 ~ c5 ~ ~] [~ ~ ~ ~ a4 ~ c5 ~] [f#4 ~ ~ ~ ~ ~ ~ ~]>";
+  "<[eb5@3 d5@2 c5@3] [g4@4 bb4@2 c5@2] [eb5@5 c5@3] [d5@4 f5@4] [eb5@2 c5@2 ab4@4] [g4@3 bb4@2 c5@3] [~ ~ ~ ~ a4@2 c5@2] [f#4@8]>";
 
 // ── SECTIONS ──────────────────────────────────────────────────────────
-// Bass and marimba, no drums and no flute. Four bars is exactly one turn of
-// porchProg, so the Cm9 is heard once, alone, before the tune ever starts.
-// Bass, marimba and the shaker — the air is established before anything
-// else, so that when the drums arrive they arrive into a room that is
-// already bright rather than turning the lights on.
+// Bass, marimba and shaker — no drums, no flute. Four bars is exactly one
+// turn of porchProg, so the Cm9 is heard once, alone, before the tune ever
+// starts. The air is established first, so that when the drums arrive they
+// arrive into a room that is already bright rather than turning the lights on.
 const intro = () =>
   stack(
     bass(porchProg, 0.78),
@@ -329,6 +386,13 @@ const porch = (mel = porchMel, extra = silence) =>
 
 // The only section in the track with hi-hats — and the shaker lifts with
 // them, since this is the section that is literally outdoors.
+//
+// CUT. The sparkle used to be in here too. That put it in five sections out
+// of seven, at which point it was not an accent, it was just part of the
+// wallpaper — and OUTSIDE already has hats and offbeat pizzicato working that
+// same register, so it was the one place it added nothing but density. It now
+// belongs to PORCH′ and PORCH″ only, where there is room above the marimba
+// and it can actually be heard arriving.
 const outside = (mel = outMel) =>
   stack(
     kit(),
@@ -336,14 +400,13 @@ const outside = (mel = outMel) =>
     bass(outProg, 0.88, outBass),
     pizz(outProg),
     shaker(0.19),
-    sparkle(outProg),
     flute(mel),
   );
 
 // Kit down, bass up, and NO marimba — with the arpeggio gone the eighth-note
 // pulse disappears for eight bars and the section floats. That is what makes
-// it read as a held breath instead of a louder PORCH. The pizz drops to one
-// stab on the downbeat so something still marks the bar.
+// it read as a held breath instead of a louder PORCH. The pizzicato thins to
+// two stabs a bar so something still marks the time without restoring a pulse.
 //
 // NO SHAKER AND NO SPARKLE. This is the only section where the air goes out,
 // and it is worth far more now than it was before the track got bright —
@@ -353,7 +416,11 @@ const bridge = () =>
   stack(
     kit(0.34),
     bass(bridProg, 0.94, bridBass),
-    pizz(bridProg, 0.3, "[0,1,2] ~ ~ ~", "Eb4"),
+    // Two stabs, on 1 and on 4. One per bar left eight bars with almost
+    // nothing holding them up; four would put a pulse back in the section
+    // that is supposed to have lost it. The beat-4 stab leans into the next
+    // bar, which is the only forward motion the bridge gets.
+    pizz(bridProg, 0.3, "[0,1,2] ~ ~ [0,1,2]", "Eb4"),
     flute(bridMel, 0.52),
   );
 
