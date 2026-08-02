@@ -4,7 +4,14 @@
       "WebFetch(domain:strudel.cc)",
       "Read(//Users/walker/Developer/music/strudel/**)",
       "Read(//Users/walker/Developer/music/**)",
-      "Bash(grep -oE \"[a-zA-Z_]{0,20}early[a-zA-Z_]{0,20}\" dist/strudel.js)"
+      "Bash(grep -oE \"[a-zA-Z_]{0,20}early[a-zA-Z_]{0,20}\" dist/strudel.js)",
+      "Read(//Users/walker/.claude/skills/**)",
+      "Read(//Users/walker/.claude/skills/strudel-beats/**)",
+      "Read(//Users/walker/.claude/skills/strudel-city-pop/**)",
+      "Bash(python3 -)",
+      "Bash(python3 -c \"import sys;[print\\(len\\(l.rstrip\\('\\\\n'\\)\\)\\) for l in sys.stdin]\")",
+      "Bash(cp loop-template.js /private/tmp/claude-501/-Users-walker-Developer-music-strudel/12ce343d-e9e3-4c64-abb8-c7205886bc8a/scratchpad/lt.bak)",
+      "Bash(npx --yes prettier@3 --write loop-template.js)"
     ]
   }
 }
