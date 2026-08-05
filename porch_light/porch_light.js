@@ -207,7 +207,7 @@ const shaker = (g = 0.16) =>
 // twice while the most important harmonic event in the track happened above
 // it, which buried the change. Now it holds one long note through the whole
 // Cm9 and gets out of the way. Going still is louder than walking here.
-const porchBass = "<[0 ~ 0 ~] [0 ~ 0 ~] [0] [0 ~ 2 1]>";
+const porchBass = "<[0 ~ 0 ~] [0 ~ 0 ~] [0 ~ ~ 2] [0 ~ 2 1]>";
 const outBass = "<[0 ~ 0 2] [0 ~ 0 2] [0 ~ 1 2] [0 ~ 0 ~]>";
 const bridBass =
   "<[0 ~ ~ ~] [0 ~ 0 2] [0 ~ ~ ~] [0 ~ 0 2] [0 ~ ~ ~] [0 ~ 0 2] [0 ~ 0 ~] [0 ~ 2 1]>";
